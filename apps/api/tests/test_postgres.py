@@ -6,11 +6,11 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import Session
+from test_data_platform import seed
 
 from argus_api.main import app
 from argus_api.models import ObservationVintage, ValidationStatus
 from argus_api.repository import validated_snapshot
-from test_data_platform import seed
 
 EXPECTED_TABLES = {
     "alembic_version",
@@ -53,7 +53,7 @@ def test_postgresql_preserves_last_known_good_active_vintage(postgres_engine):
                 run_id=run.id,
                 artifact_id=artifact.id,
                 vintage_number=2,
-                value=Decimal("99"),
+                value=Decimal(99),
                 retrieved_at=datetime.now(UTC),
                 validation_status=ValidationStatus.REJECTED,
                 source_url="https://example.test/rejected",
