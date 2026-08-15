@@ -29,3 +29,13 @@ def test_demo_home_contract_is_complete_and_unambiguous():
     assert {rate["tenor"] for rate in payload["rates"]} >= {"3M", "1Y", "10Y"}
     assert payload["events"]
     assert payload["source_health"][-1]["status"] == "DISABLED"
+
+
+def test_source_registry_contract():
+    payload = client.get("/api/v1/public/sources").json()
+    assert [item["source_id"] for item in payload] == [
+        "UST_DAILY_PAR_YIELD_CURVE",
+        "SBP_POLICY_RATE",
+    ]
+    assert payload[0]["mode"] == "OFFICIAL_EOD"
+    assert payload[1]["mode"] == "FIXTURE_ONLY"

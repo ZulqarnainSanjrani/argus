@@ -3,7 +3,14 @@ from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .models import DataSource, Observation, ObservationVintage, SeriesDefinition, ValidationStatus
+from .models import (
+    DataSource,
+    IngestionRun,
+    Observation,
+    ObservationVintage,
+    SeriesDefinition,
+    ValidationStatus,
+)
 
 
 def validated_snapshot(session: Session) -> list[dict]:
@@ -37,6 +44,11 @@ def validated_snapshot(session: Session) -> list[dict]:
                 "validation_status": vintage.validation_status.value,
                 "source": source.publisher,
                 "source_url": vintage.source_url,
+                "published_at": vintage.published_at,
+                "parser_version": session.get(IngestionRun, vintage.run_id).parser_version,
+                "raw_sha256": vintage.raw_sha256,
+                "source_format": source.source_format,
+                "market_status": "OFFICIAL_EOD",
             }
         )
     return rows

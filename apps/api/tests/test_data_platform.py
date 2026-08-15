@@ -111,11 +111,11 @@ def test_migration_schema_and_last_known_good():
         assert rows[0]["validation_status"] == "VALID"
 
 
-def test_unverified_sources_are_disabled():
-    for source in ("UST_DAILY_PAR_YIELD_CURVE", "SBP_POLICY_RATE", "SBP_KIBOR"):
-        try:
-            connector_for(source)
-        except RuntimeError as error:
-            assert "disabled" in str(error)
-        else:
-            raise AssertionError("unverified connector enabled")
+def test_only_sbp_live_source_is_disabled():
+    assert connector_for("UST_DAILY_PAR_YIELD_CURVE").source_format == "text/csv"
+    try:
+        connector_for("SBP_POLICY_RATE")
+    except RuntimeError as error:
+        assert "disabled" in str(error)
+    else:
+        raise AssertionError("SBP connector enabled")
