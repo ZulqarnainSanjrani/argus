@@ -1,6 +1,6 @@
 # ADR 0005: Phase 1 official-source selection
 
-- **Status:** Accepted for a future implementation slice
+- **Status:** Accepted and partially implemented
 - **Date:** 2026-08-15
 
 ## Context
@@ -43,6 +43,12 @@ last-known-good data, and stale data cannot be filled, estimated, or silently
 substituted.
 
 ## Consequences
+
+Implementation note (2026-08-15): the bounded Treasury annual CSV adapter is now
+enabled for manual server-side ingestion. A proxy 403 prevented an integration
+download in the implementation environment, but the route and contract already
+approved in this ADR are implemented and fail closed. SBP policy rate is kept as
+an explicit `FIXTURE_ONLY` registry entry; KIBOR is outside this narrow slice.
 
 - ARGUS can test one event-driven central-bank series, one document-delivered
   daily money-market curve, and one machine-readable daily sovereign curve.

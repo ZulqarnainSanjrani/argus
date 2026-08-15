@@ -33,6 +33,7 @@ class DataSource(Base):
     rights_url: Mapped[str] = mapped_column(Text)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     restrictions: Mapped[str] = mapped_column(Text, default="")
+    source_format: Mapped[str] = mapped_column(String(80), default="unknown")
 
 
 class SourceFetch(Base):
