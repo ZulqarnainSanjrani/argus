@@ -13,10 +13,11 @@ Browser → apps/web → ARGUS package interfaces
                     ↳ packages/design-system
                     ↳ packages/financial-formatting
 
-Future HTTP boundary → apps/api (FastAPI) → fixture response only
+Browser → apps/api (FastAPI) → repository → PostgreSQL
+                              ↳ manual provider-neutral ingestion boundary
 ```
 
-No database, external provider, job runner, authentication, secret, AI model, or execution path exists in this phase. UI fixtures and API fixtures are intentionally separate so the shell remains usable while the API contract is evaluated.
+PostgreSQL owns canonical immutable lineage and promoted last-known-good pointers. Alembic owns migrations. A manual CLI exists, but all publisher connectors fail closed pending live verification; there is no scheduler, browser-to-provider path, authentication, secret, AI model, or deployment in this slice. DEMO fixtures remain isolated fallback development data.
 
 ## Next reviewed boundaries
 

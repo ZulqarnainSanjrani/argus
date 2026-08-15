@@ -5,9 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "argus-api"
 version = "0.1.0"
-description = "ARGUS fixture-only Phase 1 API"
+description = "ARGUS data platform and public API"
 requires-python = ">=3.12"
-dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.34,<1"]
+dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.34,<1", "sqlalchemy>=2.0,<3", "psycopg[binary]>=3.2,<4", "alembic>=1.15,<2"]
 
 [project.optional-dependencies]
 dev = ["httpx>=0.28,<1", "pytest>=8,<9", "ruff>=0.11,<1"]
