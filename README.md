@@ -1,6 +1,6 @@
 # ARGUS
 
-ARGUS is a desktop-first financial markets workstation with Pakistan fixed income as a specialist domain. This Phase 1 foundation deliberately uses conspicuously labelled, static **DEMO** fixtures; it has no live feeds, authentication, database connection, AI, or execution capability.
+ARGUS is a desktop-first financial markets workstation with Pakistan fixed income as a specialist domain. The first data-platform slice adds local PostgreSQL persistence and manual ingestion boundaries. Publisher connectors remain disabled until live verification succeeds; conspicuously labelled **DEMO** fixtures are retained only when no validated database observation exists.
 
 ## Architecture
 
@@ -8,11 +8,11 @@ The npm workspace contains a Vite/React application and ARGUS-owned design-syste
 
 ```text
 apps/web                 React workstation shell
-apps/api                 FastAPI application and Python configuration
+apps/api                 FastAPI API, canonical models, registry, and manual CLI
 packages/design-system   Shared visual primitives and tokens
 packages/financial-formatting  Financial display semantics
 python/argus             Future shared Python domain package boundary
-db                       Future migrations/schema boundary (empty in Phase 1)
+db                       Alembic migration and PostgreSQL schema boundary
 tests                    Cross-application test boundary
 docs/ADRS                Architecture decisions
 infra                    Local-development infrastructure
@@ -34,7 +34,7 @@ pip install -e 'apps/api[dev]'
 
 No secret values are needed. Start the web application with `npm run dev:web`; start the API with `uvicorn argus_api.main:app --app-dir apps/api --reload`. OpenAPI is available at `http://localhost:8000/docs`.
 
-Alternatively, `docker compose up --build` starts both services for local development. The Compose file is not a production deployment definition.
+Alternatively, `docker compose up --build` starts PostgreSQL, the API, and web application for local development. Run `alembic -c db/alembic.ini upgrade head` before the first API request. The Compose file is not a production deployment definition. See the [manual ingestion runbook](docs/INGESTION_RUNBOOK.md).
 
 ## Quality commands
 
@@ -47,8 +47,8 @@ pytest apps/api/tests
 ruff check apps/api
 ```
 
-## Phase 1 boundaries
+## Data-platform boundaries
 
-All displayed observations are fictional fixtures for interaction validation, not market claims. No ingestion jobs, scheduled tasks, database migrations, credentials, or external provider setup exist yet. `db/`, `infra/`, `tests/`, and `python/argus/` establish ownership boundaries for later reviewed phases.
+The snapshot API reads promoted, validated database vintages when they exist and otherwise returns an explicitly `DEMO`-classified local fixture. No automatic jobs, credentials, or browser-to-provider calls exist. The registry fails closed for every currently unverified source. Official values must carry publisher, source URL, observation date/time, retrieval time, validation, classification, and freshness.
 
 Report security issues privately to the maintainers. Contributions must preserve DEMO labelling, provenance semantics, accessibility, and the boundaries documented in the ADRs.
