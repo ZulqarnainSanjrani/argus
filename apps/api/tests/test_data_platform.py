@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from sqlalchemy import create_engine
@@ -64,7 +64,7 @@ def seed(session: Session):
     session.add_all([artifact, run, series])
     session.flush()
     observation = Observation(
-        series_id=series.id, observation_date=date.today(), observation_time=None
+        series_id=series.id, observation_date=datetime.now(UTC).date(), observation_time=None
     )
     session.add(observation)
     session.flush()
@@ -98,7 +98,7 @@ def test_migration_schema_and_last_known_good():
                 run_id=run.id,
                 artifact_id=artifact.id,
                 vintage_number=2,
-                value=Decimal("99"),
+                value=Decimal(99),
                 retrieved_at=datetime.now(UTC),
                 validation_status=ValidationStatus.REJECTED,
                 source_url="https://example.test/data",
