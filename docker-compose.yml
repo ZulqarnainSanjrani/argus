@@ -1,4 +1,17 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: argus
+      POSTGRES_USER: argus
+      POSTGRES_PASSWORD: argus_local_only
+    ports: ["5432:5432"]
+    volumes: ["argus-postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U argus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   web:
     build:
       context: .
@@ -16,3 +29,11 @@ services:
     ports: ["8000:8000"]
     volumes:
       - ./apps/api/src:/app/apps/api/src
+      - ./db:/app/db
+    environment:
+      ARGUS_DATABASE_URL: postgresql+psycopg://argus:argus_local_only@db:5432/argus
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  argus-postgres:
