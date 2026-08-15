@@ -1,0 +1,10 @@
+export type Freshness = 'LIVE'|'DELAYED'|'EOD'|'OFFICIAL'|'STALE'|'ERROR'|'N/A';
+const missing=(value:number|null|undefined)=>value===null||value===undefined||Number.isNaN(value);
+const signed=(value:number, digits:number, suffix='')=>`${value>0?'+':''}${value.toFixed(digits)}${suffix}`;
+export const formatYield=(value:number|null|undefined)=>missing(value)?'—':`${value!.toFixed(2)}%`;
+export const formatBasisPoints=(value:number|null|undefined)=>missing(value)?'—':signed(value!,1,' bp');
+export const formatPercent=(value:number|null|undefined)=>missing(value)?'—':signed(value!,2,'%');
+export const formatCurrency=(value:number|null|undefined,currency='PKR')=>missing(value)?'—':new Intl.NumberFormat('en-US',{style:'currency',currency,minimumFractionDigits:2,maximumFractionDigits:2}).format(value!);
+export const formatLevel=(value:number|null|undefined,digits=2)=>missing(value)?'—':new Intl.NumberFormat('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits}).format(value!);
+export const formatTimestamp=(value:string|Date,timeZone='UTC')=>new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:false,timeZone,timeZoneName:'short'}).format(new Date(value));
+export const freshnessLabel=(status:Freshness,delayMinutes?:number)=>status==='DELAYED'&&delayMinutes?`DELAYED ${delayMinutes}M`:status;

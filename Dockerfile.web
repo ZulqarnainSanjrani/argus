@@ -1,0 +1,11 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY apps/web/package.json apps/web/package.json
+COPY packages/design-system/package.json packages/design-system/package.json
+COPY packages/financial-formatting/package.json packages/financial-formatting/package.json
+RUN npm install
+COPY apps/web apps/web
+COPY packages packages
+EXPOSE 5173
+CMD ["npm","run","dev:web","--","--host","0.0.0.0"]
