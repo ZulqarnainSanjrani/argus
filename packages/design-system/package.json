@@ -1,0 +1,1 @@
+{"name":"@argus/design-system","version":"0.1.0","type":"module","exports":{".":"./src/index.tsx","./tokens.css":"./src/tokens.css"},"scripts":{"typecheck":"tsc --noEmit"},"dependencies":{"react":"latest"},"devDependencies":{"@types/react":"latest","typescript":"latest"}}

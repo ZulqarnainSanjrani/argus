@@ -1,0 +1,2 @@
+:root{color-scheme:dark;--bg:#071015;--surface:#0b151c;--panel:#0e1a22;--elevated:#14232c;--border:#243743;--border-strong:#38505e;--text:#d8e2e7;--muted:#7f939f;--accent:#58b9c6;--positive:#53b58a;--negative:#e16b70;--warning:#d8a84e;--neutral:#90a2ac;--radius:3px;--font-sans:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;--font-mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:12px}button,input{font:inherit}button{color:inherit}
