@@ -2,6 +2,12 @@
 
 **Review date:** 2026-08-15
 
+**Implementation update:** The official Treasury annual CSV route is implemented
+as the sole real provider in this slice. SBP policy rate remains a fixture-only,
+fail-closed registry contract because the reviewed HTML route is not a documented
+machine-readable interface and redistribution terms remain insufficiently clear.
+KIBOR was not implemented or registered in the runtime slice.
+
 **Scope:** source selection only; no source was connected, no credentials were
 added, and no ingestion or browser-side request was implemented.
 

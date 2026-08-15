@@ -1,6 +1,6 @@
 # ARGUS
 
-ARGUS is a desktop-first financial markets workstation with Pakistan fixed income as a specialist domain. The first data-platform slice adds local PostgreSQL persistence and manual ingestion boundaries. Publisher connectors remain disabled until live verification succeeds; conspicuously labelled **DEMO** fixtures are retained only when no validated database observation exists.
+ARGUS is a desktop-first financial markets workstation with Pakistan fixed income as a specialist domain. The first real-data slice adds a bounded official U.S. Treasury daily par-yield CSV adapter, PostgreSQL persistence, validation/quarantine, immutable provenance, and last-known-good publication. The SBP policy-rate adapter remains fixture-only because no stable machine-readable route and sufficiently clear redistribution permission were verified. Conspicuously labelled **DEMO** fixtures remain only where no validated database observation exists.
 
 ## Architecture
 
@@ -49,6 +49,6 @@ ruff check apps/api
 
 ## Data-platform boundaries
 
-The snapshot API reads promoted, validated database vintages when they exist and otherwise returns an explicitly `DEMO`-classified local fixture. No automatic jobs, credentials, or browser-to-provider calls exist. The registry fails closed for every currently unverified source. Official values must carry publisher, source URL, observation date/time, retrieval time, validation, classification, and freshness.
+The snapshot API reads promoted, validated database vintages when they exist and otherwise returns an explicitly `DEMO`-classified local fixture. No automatic jobs, credentials, or browser-to-provider calls exist. Treasury data is always labelled `OFFICIAL_EOD`, never live. Official values carry publisher, source URL, observation/publication/retrieval times, format, parser version, validation, checksum, classification, and freshness.
 
 Report security issues privately to the maintainers. Contributions must preserve DEMO labelling, provenance semantics, accessibility, and the boundaries documented in the ADRs.

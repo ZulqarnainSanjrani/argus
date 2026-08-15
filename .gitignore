@@ -9,3 +9,4 @@ __pycache__/
 .env
 screenshots/
 docs/screenshots/*.png
+.argus-artifacts/

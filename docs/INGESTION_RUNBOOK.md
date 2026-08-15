@@ -5,14 +5,15 @@
 Live verification was attempted from the implementation environment with a
 named, low-impact user agent. Its outbound CONNECT proxy returned HTTP 403 for
 every publisher host before a publisher response was received. Consequently,
-**no source-specific connector is enabled** and no official observation was
-downloaded, parsed, stored, or displayed.
+no official observation was downloaded during implementation. The already
+approved Treasury CSV contract is enabled for bounded manual ingestion and
+fails closed on HTTP, media-type, schema, or value errors. It is not described
+as live verification.
 
 | Source | Exact candidate endpoints checked | Result / restriction |
 |---|---|---|
-| U.S. Treasury daily par yield curve | `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv`; [methodology](https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/treasury-yield-curve-methodology); [policy](https://home.treasury.gov/about/general-information/website-policies-notices) | **DEFERRED/DISABLED**. Proxy 403 prevented verification of response format, methodology, timing, and current policy. |
-| SBP policy rate | `https://www.sbp.org.pk/ecodata/policy_rate.asp`; [disclaimer](https://www.sbp.org.pk/other/Disclaimer.htm) | **DEFERRED/DISABLED**. No raw-document distribution or bulk public series API; endpoint and display rights require live review. |
-| SBP KIBOR | `https://www.sbp.org.pk/ecodata/kibor_index.asp`; [disclaimer](https://www.sbp.org.pk/other/Disclaimer.htm) | **DEFERRED/DISABLED**. Never expose raw PDFs or a bulk download/export/feed. Exact daily document format and permitted attributed delayed/EOD display require live review. |
+| U.S. Treasury daily par yield curve | `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv`; [methodology](https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/treasury-yield-curve-methodology); [policy](https://home.treasury.gov/about/general-information/website-policies-notices) | **ENABLED / OFFICIAL EOD** for manual ingestion. Proxy 403 blocked the environment integration check; operational monitoring must retain this limitation and never label the feed live. |
+| SBP policy rate | `https://www.sbp.org.pk/ecodata/policy_rate.asp`; [disclaimer](https://www.sbp.org.pk/other/Disclaimer.htm) | **FIXTURE_ONLY / LIVE DISABLED**. No stable documented machine-readable route or sufficiently clear bulk-redistribution permission was verified. |
 
 Do not bypass the proxy, guess a URL, use a mirror, or enable a registration to
 work around this gate. Reverification must capture status, final URL, media
@@ -50,8 +51,10 @@ be made public for restricted SBP artifacts.
 
 ## One-shot execution
 
-There is intentionally no scheduler. `python -m argus_api.cli SOURCE` performs
-one bounded manual run, and fails closed while a registry entry is disabled.
+There is intentionally no scheduler. `python -m argus_api.cli UST_DAILY_PAR_YIELD_CURVE`
+performs one bounded manual run; `--dry-run` fetches, parses, and validates without
+writing. `ARGUS_DATABASE_URL` is required for publication and
+`ARGUS_ARTIFACT_DIR` optionally retains official Treasury CSV bytes by checksum.
 The ingestion transaction must insert fetch/artifact/run/validation and a new
 vintage first; only after all release-level checks are `VALID` may it change
 `observations.active_vintage_id`. A rejected/quarantined run remains audit

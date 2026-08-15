@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from .db import session_factory
 from .repository import validated_snapshot
+from .ingestion import REGISTRY
 
 
 class SnapshotObservation(BaseModel):
@@ -24,6 +25,11 @@ class SnapshotObservation(BaseModel):
     validation_status: str
     source: str
     source_url: str | None = None
+    published_at: datetime | None = None
+    parser_version: str | None = None
+    raw_sha256: str | None = None
+    source_format: str | None = None
+    market_status: Literal["OFFICIAL_EOD"] | None = None
 
 
 class Snapshot(BaseModel):
@@ -91,6 +97,22 @@ def health() -> dict[str, str]:
         "database": "configured" if session_factory() else "not_configured",
         "automatic_jobs": "disabled",
     }
+
+
+@app.get("/api/v1/public/sources", tags=["public"])
+def sources() -> list[dict[str, str]]:
+    """Expose the bounded source registry, including disabled fixture-only entries."""
+    return [
+        {
+            "source_id": item.source_id,
+            "name": item.name,
+            "canonical_url": item.canonical_url,
+            "source_format": item.source_format,
+            "mode": item.mode,
+            "reason": item.reason,
+        }
+        for item in REGISTRY.values()
+    ]
 
 
 @app.get("/api/v1/demo/home", response_model=DemoHome, tags=["demo"])
