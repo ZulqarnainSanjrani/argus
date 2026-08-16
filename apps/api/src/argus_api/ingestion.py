@@ -35,7 +35,7 @@ UST_URL = (
     "field_tdr_date_value={year}&page&_format=csv"
 )
 UST_POLICY = "https://home.treasury.gov/about/general-information/website-policies-notices"
-SBP_URL = "https://www.sbp.org.pk/ecodata/policy_rate.asp"
+SBP_URL = "https://www.sbp.org.pk/our-operations/monetary-policy"
 TENORS = {
     "1 Mo": "1M",
     "1.5 Month": "1.5M",
@@ -93,7 +93,7 @@ class TreasuryConnector:
                 "User-Agent": os.getenv("ARGUS_USER_AGENT", "ARGUS/0.2"),
             },
         )
-        with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310
+        with urllib.request.urlopen(request, timeout=30) as response:
             if response.status != 200 or "csv" not in response.headers.get_content_type():
                 raise PayloadError("Treasury response was not a CSV success response")
             return response.read(5_000_001)
@@ -114,7 +114,11 @@ class TreasuryConnector:
         seen: set[date] = set()
         for row in reader:
             try:
-                observed = datetime.strptime(row["Date"].strip(), "%m/%d/%Y").date()
+                observed = (
+                    datetime.strptime(row["Date"].strip(), "%m/%d/%Y")
+                    .replace(tzinfo=UTC)
+                    .date()
+                )
             except (ValueError, AttributeError) as error:
                 raise PayloadError("invalid observation date") from error
             if observed in seen:
@@ -129,7 +133,7 @@ class TreasuryConnector:
                     value = Decimal(raw)
                 except InvalidOperation as error:
                     raise PayloadError(f"non-numeric {column}") from error
-                if not Decimal("0") < value < Decimal("30"):
+                if not Decimal(0) < value < Decimal(30):
                     raise PayloadError(f"out-of-range {column}")
                 day.append(CandidateObservation(f"US.UST.PAR_YIELD.{tenor}", observed, value))
             if len(day) < 6:
@@ -167,7 +171,11 @@ REGISTRY = {
         SBP_URL,
         "text/html",
         "FIXTURE_ONLY",
-        "No documented stable machine-readable route or explicit redistribution licence; live adapter disabled",
+        (
+            "EasyData API requires account/API key; credential-free pages lack a current "
+            "effective-dated observation contract and explicit storage/public-redistribution "
+            "permission; live adapter disabled"
+        ),
     ),
 }
 

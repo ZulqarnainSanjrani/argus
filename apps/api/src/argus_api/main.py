@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from .db import session_factory
-from .repository import validated_snapshot
 from .ingestion import REGISTRY
+from .repository import validated_snapshot
 
 
 class SnapshotObservation(BaseModel):

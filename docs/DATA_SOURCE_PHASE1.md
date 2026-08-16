@@ -1,45 +1,46 @@
 # Phase 1 real-data source feasibility and rights review
 
-**Review date:** 2026-08-15
+**Initial review date:** 2026-08-15
+
+**SBP policy-rate gate:** 2026-08-16
 
 **Implementation update:** The official Treasury annual CSV route is implemented
 as the sole real provider in this slice. SBP policy rate remains a fixture-only,
-fail-closed registry contract because the reviewed HTML route is not a documented
-machine-readable interface and redistribution terms remain insufficiently clear.
-KIBOR was not implemented or registered in the runtime slice.
+fail-closed registry contract after live review found a credentialed official
+API, non-canonical credential-free pages, and no explicit storage/public-display
+permission. KIBOR was not revisited, implemented, or registered in this gate.
 
-**Scope:** source selection only; no source was connected, no credentials were
-added, and no ingestion or browser-side request was implemented.
+**Scope:** this amendment evaluates only official SBP policy-rate routes and
+official website/EasyData disclaimers. No SBP credential, adapter, fixture,
+ingestion, browser-side provider call, scheduler, or public observation was added.
 
 ## Executive decision
 
 | Dataset | Decision | Reason |
 |---|---|---|
-| State Bank of Pakistan (SBP) policy rate | **APPROVE WITH RESTRICTIONS** | The official, low-volume HTML history is technically suitable, but the reviewed public materials do not provide an explicit open-data licence for republishing the complete series. |
+| State Bank of Pakistan (SBP) policy rate | **DISABLED / NOT SUFFICIENTLY VERIFIED** | The documented EasyData API requires an account/API key; public pages do not provide a current effective-dated observation contract; and official terms do not grant storage/public redistribution. |
 | SBP KIBOR | **APPROVE WITH RESTRICTIONS** | Official daily publications are feasible to collect, but their document-oriented delivery is fragile and no explicit grant for bulk storage or public redistribution was established. |
-| Official US Treasury daily par yield curve | **APPROVE FOR IMPLEMENTATION** | Treasury provides first-party machine-readable downloads and US federal-government material is generally reusable under the stated site policy, subject to exceptions and attribution. |
+| Official US Treasury daily par yield curve | **IMPLEMENTED / OFFICIAL EOD** | The merged bounded manual CSV slice includes validation, provenance, immutable vintages, and last-known-good promotion. It is not live and has no scheduler. |
 
-These approvals authorize a later, separately reviewed server-side ingestion
-slice. They do not authorize browser calls, scraping, or implementation in this
-task. In particular, ARGUS must not offer downloadable SBP raw files or a bulk
-SBP-series API until the rights question is resolved in writing.
+The SBP decision authorizes no collection or publication. ARGUS must not offer
+an SBP observation, raw file, or series API until the technical and rights gates
+are resolved. The pre-existing KIBOR selection is unchanged and outside this
+policy-rate-only review.
 
 ## Review method and common rules
 
 This review uses publisher-owned pages and policies, rather than aggregators.
-Exact URLs and conclusions should be rechecked immediately before an adapter is
-merged: this environment could not establish a connection to the publisher
-hosts during the review, so endpoint behavior and page text were not live-tested.
-That limitation is deliberately reflected in the restricted SBP decisions and
-in implementation gates below; remembered values or third-party mirrors must
-not be substituted.
+On 2026-08-16 the SBP main site and EasyData portal were inspected directly as a
+guest. Dynamic session/checksum URLs were observed only to understand the public
+flow; they are not treated as stable contracts and were not replayed outside the
+site. No access control was bypassed, and no remembered value or third-party
+mirror was substituted.
 
-All three adapters should be scheduled server-side, identify ARGUS in the user
-agent, use conditional requests where supported, apply a low request rate with
-exponential backoff, and never make one upstream request per user. Store the
-received bytes privately with a checksum, retrieval time, media type, URL,
-parser version, validation outcome, and ingestion-run ID. A parse failure must
-not promote any observation or replace the last-known-good record.
+Any later approved adapter must run server-side, identify ARGUS in the user
+agent, apply bounded requests/backoff, and never make one upstream request per
+user. Store only rights-approved audit material with checksum, retrieval time,
+media type, URL, parser version, validation outcome, and ingestion-run ID. A
+parse failure must not promote an observation or replace last-known-good data.
 
 ### Canonical mapping used by this review
 
@@ -68,87 +69,83 @@ Every display must show source, observation date, retrieval time, and freshness.
 
 ## 1. State Bank of Pakistan policy rate
 
-### Source, delivery, and schedule
+### Official route evidence (verified 2026-08-16)
 
-- **Publisher/official source:** State Bank of Pakistan.
-- **Canonical public page:** <https://www.sbp.org.pk/ecodata/policy_rate.asp>.
-- **Supporting monetary-policy landing page:**
-  <https://www.sbp.org.pk/m_policy/index.asp>.
-- **Terms/disclaimer review point:** <https://www.sbp.org.pk/other/Disclaimer.htm>.
-- **Available format:** HTML table/page. No official CSV, XLS/XLSX, RSS, or
-  documented API is relied on by this decision. Monetary Policy Statements may
-  also be PDF, but those PDFs are corroboration, not the primary numeric feed.
-- **Frequency/timing:** event-driven. A new target rate becomes effective when
-  SBP announces a monetary-policy decision; there is no dependable daily release
-  time. Poll once on scheduled Monetary Policy Committee decision days after the
-  announcement window, once the following Pakistan business morning, and no
-  more than daily otherwise.
+| Official route | Verified behavior | Feasibility consequence |
+|---|---|---|
+| [Current SBP monetary-policy page](https://www.sbp.org.pk/our-operations/monetary-policy) | Public HTML shows the current policy rate, interest-rate corridor, MPC calendar, and official statement links. The rate display has no effective/observation date. | Useful for human corroboration, but not a canonical observation payload. |
+| [Legacy policy-rate URL](https://www.sbp.org.pk/ecodata/policy_rate.asp) | The URL now renders the redesigned SBP home page rather than a dedicated historical table. | The previously proposed HTML-history adapter contract no longer exists. |
+| [SBP EasyData](https://easydata.sbp.org.pk/) | Public guest portal identifies policy series `TS_GP_IR_SIRPR_AH.SBPOL0030`, unit `Percent`, frequency `As-Needed`, and provides citation and download UI. The flow uses Oracle APEX session/checksum URLs. At review time the series metadata ended and was last refreshed on 2026-04-28, despite later MPC decisions linked on the main site. | Official provenance exists, but the guest surface was not current and its dynamic UI is not a stable retrieval contract. |
+| EasyData documented API | Developer Guide documents `GET https://easydata.sbp.org.pk/api/v1/series/[series_key]/data` with JSON/CSV output. `api_key` is mandatory; an account/login is required; keys expire after 90 days; documented limits are 2,000 requests/day and 250/hour. | Technically structured, but credentials are required and prohibited by this gate. ARGUS must not omit, borrow, or work around the key. |
 
-### Rights assessment
+No official mirror, guessed download URL, policy-statement extraction, or
+credential was used. Direct access to `https://www.sbp.org.pk/robots.txt`
+returned an access-denied page during review; no attempt was made to bypass it.
 
-Public access and linking are appropriate. Individual policy-rate facts are
-suited to attributed display, and ARGUS may retain the minimum source response
-needed for audit and last-known-good operation. However, availability on a
-public page is not itself an open-data licence. This review did not establish an
-explicit permission for bulk republication of SBP's historical compilation,
-mirroring its page, or distributing its raw HTML/PDFs. SBP name and logo must
-not imply endorsement.
+### Public website/data-use evidence
 
-**Restriction:** display attributed factual observations and derived charts in
-ARGUS, link to SBP, and keep raw responses private and access-controlled. Do not
-expose raw documents, a bulk download, or a redistributable series API. Before
-launch, counsel/maintainer must re-read the live disclaimer and obtain SBP
-clarification if public historical export is desired. Record that verification
-date in the rights registry.
+The [current SBP disclaimer](https://www.sbp.org.pk/our-operations/disclaimer)
+states that content is general information, gives no warranty of accuracy,
+currency, availability, or completeness, and may be modified, suspended, or
+removed. The current site footer states `Copyright © 2026. All Rights Reserved.`
 
-### Collection and mapping
+The EasyData guest disclaimer says data is for information/reference, may be
+downloaded at the user's risk, may change or cease to be available, and may
+include third-party material. EasyData supplies a citation for the series, but
+its footer also states `All Rights Reserved`. Neither official disclaimer grants
+ARGUS a licence for systematic retrieval, persistent audit storage, attributed
+public display, or redistribution through a public API.
 
-Use a narrowly scoped HTML-table adapter against the canonical page—not a
-general crawler. Fetch at the above cadence, retain bytes/checksum, locate the
-table by normalized headers rather than CSS position, parse dates explicitly,
-and normalize percentage text to decimal-safe values. Cross-check a new change
-against the linked official Monetary Policy Statement; disagreement quarantines
-the new row for review rather than choosing one silently.
+The fact that a value is publicly viewable or downloadable is not treated as
+permission for ARGUS's intended public product. This is a feasibility decision,
+not legal advice; absent clear official permission, the rights gate fails closed.
+
+### Technical and canonical assessment
+
+ARGUS can technically read the public current-value HTML, but cannot safely map
+it to `observation_date` or evaluate event-driven freshness without an effective
+date. EasyData provides the desired series identity and metadata, but its stable
+machine-readable route is credentialed and its guest observation history was not
+current during review. A session-backed guest download is not an acceptable
+substitute for the documented API.
+
+Consequently ARGUS cannot currently demonstrate a lawful and reliable path to
+retrieve, store provenance for, and publicly display the official policy-rate
+observation under this task's constraints.
+
+The intended mapping remains reserved, not implemented:
 
 - `series_id`: `PK.SBP.POLICY_RATE.TARGET`
-- `observation_date`: effective date shown by SBP
-- `value`: stated rate; `unit`: `PERCENT_PER_ANNUM`
-- `observation_time`: null unless SBP states one
-- `source_id`: `SBP_POLICY_RATE`; `fact_class`: `FACT`
-- statement title/URL: supporting provenance, not the source of an inferred time
+- `source_id`: `SBP_POLICY_RATE`
+- `publisher_series_key`: `TS_GP_IR_SIRPR_AH.SBPOL0030`
+- `value`: source decimal; `unit`: `PERCENT_PER_ANNUM`
+- `observation_date`: publisher-supplied effective date only
+- `observation_time`: null unless explicitly supplied
+- `fact_class`: `FACT`
 
-### Freshness, validation, fixtures, and failure
+### Freshness, validation, fixtures, and failure gate
 
-- **Fresh:** the latest validated row agrees with the official page and no
-  announced decision with a later effective date is outstanding.
-- **Pending:** from an announced/scheduled decision until the next Pakistan
-  business day at 12:00 PKT if no new effective row appears.
-- **Stale:** later than that deadline, or 24 hours after ARGUS learns of an
-  official decision but cannot validate the effective rate. An unchanged rate
-  after a decision remains a fresh observation only when the official release
-  confirms “unchanged”; do not manufacture a duplicate row.
+Policy-rate freshness is event-driven, not a fixed elapsed-time TTL. A future
+adapter must track scheduled/announced MPC decisions and publisher effective
+dates. An unchanged decision must not create a duplicate observation. Missing or
+conflicting effective dates, stale EasyData metadata, disagreement between
+official routes, unknown units, duplicate dates, or values outside
+`0 < rate < 100` must quarantine the candidate.
 
-Reject duplicate effective dates with conflicting values, unparseable dates,
-missing units, values outside `0 < rate < 100`, multiple candidate tables, or a
-history that unexpectedly shrinks. Quarantine rather than guess whether the
-page expresses a target, ceiling, floor, or old discount rate.
+No adapter or fixture is added while the source is disabled. If the gate later
+passes, fixtures must be synthetic and cover event changes, unchanged decisions,
+duplicate/conflicting effective dates, missing units/dates, schema changes, and
+last-known-good preservation. Failed retrieval or validation must never emit an
+estimate, infer the rate from corridor bounds or prose, or replace the last
+validated observation.
 
-Fixtures must be small, hand-minimized HTML documents derived from the table
-shape with **synthetic, conspicuously non-market values**, saved with source URL,
-capture date, expected records, media type, parser version, and a note that the
-fixture is test-only and not redistributable source data. Include reordered
-columns, footnotes, commas/non-breaking spaces, malformed dates, duplicate rows,
-empty cells, and an unrelated table. Keep a checksum-only manifest for any
-private golden raw response.
+**Exact blocker:** SBP must provide (1) a stable credential-free official
+response containing value, unit, effective/observation date, and revision
+semantics, and (2) an explicit licence or written permission covering ARGUS's
+retrieval, minimum provenance retention, attributed public display, and intended
+API exposure.
 
-On HTTP, parse, or validation failure, record the failed run, keep serving the
-last validated observation with its original date/source, and expose
-`STALE`/`SOURCE_ERROR` when the deadline passes. Never emit zero, null-as-zero,
-an estimate, or a policy-statement-derived guess.
-
-**Suitability:** suitable for the free public ARGUS product under the display,
-attribution, private-cache, and no-bulk-redistribution restrictions above.
-**Decision: APPROVE WITH RESTRICTIONS.**
+**Decision: DISABLED / NOT SUFFICIENTLY VERIFIED.**
 
 ## 2. State Bank of Pakistan KIBOR
 

@@ -17,7 +17,14 @@ Browser → apps/api (FastAPI) → repository → PostgreSQL
                               ↳ manual provider-neutral ingestion boundary
 ```
 
-PostgreSQL owns canonical immutable lineage and promoted last-known-good pointers. Alembic owns migrations. A manual CLI exists, but all publisher connectors fail closed pending live verification; there is no scheduler, browser-to-provider path, authentication, secret, AI model, or deployment in this slice. DEMO fixtures remain isolated fallback development data.
+PostgreSQL owns canonical immutable lineage and promoted last-known-good pointers.
+Alembic owns migrations. A manual CLI exposes the merged official U.S. Treasury
+EOD CSV connector; it has no scheduler and is not a live feed. SBP policy rate
+fails closed because its structured official route requires credentials, its
+public pages do not provide a current effective-dated observation contract, and
+redistribution rights remain unverified. There is no browser-to-provider path,
+authentication, secret, AI model, or deployment in this slice. DEMO fixtures
+remain isolated fallback development data.
 
 ## Static workstation foundation status
 
@@ -39,4 +46,8 @@ screenshot artifacts are intentionally excluded from version control.
 
 ## Next reviewed boundaries
 
-Provider adapters, canonical observations, provenance storage, user identity, layout persistence, and deployments require separate decisions. Each should depend inward on ARGUS domain contracts rather than exposing provider-specific models to UI components.
+Additional provider adapters, user identity, layout persistence, and deployments
+require separate decisions. The merged Treasury slice establishes canonical
+observations and provenance storage; future providers should depend inward on
+those ARGUS domain contracts rather than expose provider-specific models to UI
+components.

@@ -1,10 +1,23 @@
 # ARGUS
 
-ARGUS is a desktop-first financial markets workstation with Pakistan fixed income as a specialist domain. The first real-data slice adds a bounded official U.S. Treasury daily par-yield CSV adapter, PostgreSQL persistence, validation/quarantine, immutable provenance, and last-known-good publication. The SBP policy-rate adapter remains fixture-only because no stable machine-readable route and sufficiently clear redistribution permission were verified. Conspicuously labelled **DEMO** fixtures remain only where no validated database observation exists.
+ARGUS is a desktop-first financial markets workstation with Pakistan fixed income
+as a specialist domain. The first real-data slice adds a bounded official U.S.
+Treasury daily par-yield CSV adapter, PostgreSQL persistence,
+validation/quarantine, immutable provenance, and last-known-good publication.
+The SBP policy-rate adapter remains fixture-only: SBP's documented EasyData API
+requires an account and API key, the credential-free pages do not provide a
+current effective-dated observation contract, and no explicit
+storage/public-redistribution permission was verified. Conspicuously labelled
+**DEMO** fixtures remain only where no validated database observation exists.
 
 ## Architecture
 
-The npm workspace contains a Vite/React application and ARGUS-owned design-system and formatting packages. A separate FastAPI service exposes fixture-only public endpoints. Product code does not depend on OpenTerminalUI. See [`docs/ARCHITECTURE_PLAN.md`](docs/ARCHITECTURE_PLAN.md) and the ADRs in [`docs/ADRS`](docs/ADRS).
+The npm workspace contains a Vite/React application and ARGUS-owned design-system
+and formatting packages. A separate FastAPI service exposes versioned public
+endpoints backed by promoted official observations when available and explicit
+DEMO fallback data otherwise. Product code does not depend on OpenTerminalUI.
+See [`docs/ARCHITECTURE_PLAN.md`](docs/ARCHITECTURE_PLAN.md) and the ADRs in
+[`docs/ADRS`](docs/ADRS).
 
 ```text
 apps/web                 React workstation shell

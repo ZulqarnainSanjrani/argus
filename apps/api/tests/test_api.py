@@ -39,3 +39,7 @@ def test_source_registry_contract():
     ]
     assert payload[0]["mode"] == "OFFICIAL_EOD"
     assert payload[1]["mode"] == "FIXTURE_ONLY"
+    assert payload[1]["canonical_url"].endswith("/our-operations/monetary-policy")
+    assert "API key" in payload[1]["reason"]
+    assert "effective-dated" in payload[1]["reason"]
+    assert "public-redistribution" in payload[1]["reason"]

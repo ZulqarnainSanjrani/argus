@@ -1,3 +1,6 @@
 # Shared Python boundary
 
-Provider-neutral financial domain logic will live here after explicit approval. Phase 1 intentionally contains no ingestion or financial analytics implementation.
+Provider-neutral financial domain logic will live here after explicit approval.
+This shared package boundary currently contains no implementation; the bounded
+Treasury ingestion slice remains in `apps/api` until a reviewed extraction is
+warranted.
