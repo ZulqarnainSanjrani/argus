@@ -1,26 +1,30 @@
 # Manual ingestion runbook
 
-## Source verification record (2026-08-15 UTC)
+## Source verification record
 
-Live verification was attempted from the implementation environment with a
-named, low-impact user agent. Its outbound CONNECT proxy returned HTTP 403 for
-every publisher host before a publisher response was received. Consequently,
-no official observation was downloaded during implementation. The already
-approved Treasury CSV contract is enabled for bounded manual ingestion and
-fails closed on HTTP, media-type, schema, or value errors. It is not described
-as live verification.
+Treasury verification was attempted on 2026-08-15 UTC with a named, low-impact
+user agent. The outbound CONNECT proxy returned HTTP 403 before a publisher
+response was received, so no official Treasury observation was downloaded. The
+already approved CSV contract is enabled for bounded manual ingestion and fails
+closed on HTTP, media-type, schema, or value errors. It is not a live feed.
+
+SBP policy-rate routes and disclaimers were inspected directly as a public guest
+on 2026-08-16. No observation was downloaded into ARGUS, no account or API key
+was created, and no dynamic session route was replayed or automated.
 
 | Source | Exact candidate endpoints checked | Result / restriction |
 |---|---|---|
 | U.S. Treasury daily par yield curve | `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv`; [methodology](https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/treasury-yield-curve-methodology); [policy](https://home.treasury.gov/about/general-information/website-policies-notices) | **ENABLED / OFFICIAL EOD** for manual ingestion. Proxy 403 blocked the environment integration check; operational monitoring must retain this limitation and never label the feed live. |
-| SBP policy rate | `https://www.sbp.org.pk/ecodata/policy_rate.asp`; [disclaimer](https://www.sbp.org.pk/other/Disclaimer.htm) | **FIXTURE_ONLY / LIVE DISABLED**. No stable documented machine-readable route or sufficiently clear bulk-redistribution permission was verified. |
+| SBP policy rate | [current monetary-policy page](https://www.sbp.org.pk/our-operations/monetary-policy); [EasyData](https://easydata.sbp.org.pk/), series `TS_GP_IR_SIRPR_AH.SBPOL0030`; [current disclaimer](https://www.sbp.org.pk/our-operations/disclaimer) | **FIXTURE_ONLY / DISABLED**. EasyData's documented JSON/CSV API requires an account/API key. The current public HTML lacks an effective date; the guest EasyData series lagged later MPC decisions; and both official surfaces retain all rights without an explicit ARGUS storage/public-display grant. |
 
-Do not bypass the proxy, guess a URL, use a mirror, or enable a registration to
-work around this gate. Reverification must capture status, final URL, media
-type, headers, a checksum, methodology and rights text/version, publication
-timing, and UTC verification time. Only then add synthetic parser fixtures for
-malformed data, changed headers, duplicate releases, missing dates, and stale
-data alongside the connector.
+Do not bypass access controls, automate the EasyData guest UI, replay APEX
+session/checksum URLs, guess a download route, use a mirror, infer a value from
+the corridor or a policy statement, register credentials, or enable the source
+to work around this gate. Reverification must capture a stable credential-free
+response with value/unit/effective date/revision semantics plus explicit rights
+for retrieval, audit retention, attributed public display, and the intended API
+surface. Only after both conditions pass may a separately reviewed change add a
+manual event-driven connector and synthetic fixtures.
 
 ## Local database and migration
 
